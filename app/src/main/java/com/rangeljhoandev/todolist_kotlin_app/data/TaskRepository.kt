@@ -11,4 +11,19 @@ class TaskRepository {
         return response
     }
 
+    suspend fun getTaskById(taskId: Long): Task? {
+        val response = service.getTaskById(taskId)
+        return response
+    }
+
+    suspend fun saveTask(task: Task): Task? {
+        val response = service.saveTask(task)
+        return response
+    }
+
+    suspend fun deleteTaskById(taskId: Long): Task? {
+        val response = service.deleteTaskById(taskId)
+        return response
+    }
+
 }

@@ -46,6 +46,7 @@ dependencies {
     implementation(libs.retrofit)
     implementation(libs.converter.gson)
     implementation(libs.androidx.lifecycle.viewmodel.ktx)
+    implementation(libs.androidx.swiperefreshlayout)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

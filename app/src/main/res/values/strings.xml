@@ -1,10 +1,16 @@
 <resources>
+    <string name="concat_due_date">Due date: %s</string>
+
     <string name="app_name">ToDoList-Kotlin-App</string>
     <string name="task_list">Task list</string>
     <string name="task_title">Task title</string>
     <string name="task_description">Task description</string>
     <string name="task_due_date">Task due date</string>
     <string name="add_a_new_task">Add a new task</string>
-
-    <string name="concat_due_date">Due date: %s</string>
+    <string name="no_tasks_created">No tasks created</string>
+    <string name="description">Description</string>
+    <string name="title">Title</string>
+    <string name="due_date">Due date</string>
+    <string name="new_task">New task</string>
+    <string name="done">Done</string>
 </resources>
