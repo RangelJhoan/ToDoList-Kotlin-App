@@ -4,11 +4,13 @@ import android.graphics.Paint
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.rangeljhoandev.todolist_kotlin_app.R
 import com.rangeljhoandev.todolist_kotlin_app.data.model.Task
 import com.rangeljhoandev.todolist_kotlin_app.data.model.enums.TaskState
 import com.rangeljhoandev.todolist_kotlin_app.databinding.ItemTaskListBinding
+import com.rangeljhoandev.todolist_kotlin_app.ui.adapter.util.TaskListAdapterDiffUtil
 import com.rangeljhoandev.todolist_kotlin_app.util.DateUtil
 
 class TaskListAdapter(
@@ -84,4 +86,13 @@ class TaskListAdapter(
             binding.tvTaskDueDate.setTextColor(textColorTvTaskDueDate)
         }
     }
+
+    fun updateTasks(newTasks: ArrayList<Task>) {
+        val diffCallback = TaskListAdapterDiffUtil(taskList, newTasks)
+        val diffResult = DiffUtil.calculateDiff(diffCallback)
+        taskList.clear()
+        taskList.addAll(newTasks)
+        diffResult.dispatchUpdatesTo(this)
+    }
+
 }

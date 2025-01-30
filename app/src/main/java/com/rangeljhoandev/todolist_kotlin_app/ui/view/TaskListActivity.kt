@@ -5,7 +5,6 @@ import android.os.Build
 import android.os.Bundle
 import android.view.View
 import android.view.WindowInsetsController
-import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -18,18 +17,19 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
 import com.rangeljhoandev.todolist_kotlin_app.R
 import com.rangeljhoandev.todolist_kotlin_app.data.model.Task
-import com.rangeljhoandev.todolist_kotlin_app.data.model.enums.TaskState
 import com.rangeljhoandev.todolist_kotlin_app.databinding.ActivityTaskListBinding
 import com.rangeljhoandev.todolist_kotlin_app.ui.adapter.TaskListAdapter
+import com.rangeljhoandev.todolist_kotlin_app.ui.view.constants.TaskKeys
 import com.rangeljhoandev.todolist_kotlin_app.ui.viewmodel.TaskViewModel
-import kotlinx.coroutines.*
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class TaskListActivity : AppCompatActivity() {
     private lateinit var taskListBinding: ActivityTaskListBinding
     private val taskViewModel: TaskViewModel by viewModels()
 
-    private var taskListAdapter: TaskListAdapter? = null
-    private var taskList: ArrayList<Task>? = null
+    private lateinit var taskListAdapter: TaskListAdapter
+    private val taskList: ArrayList<Task> = arrayListOf()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -56,10 +56,26 @@ class TaskListActivity : AppCompatActivity() {
         taskListBinding.srlRefreshTaskList.isRefreshing = true
         taskViewModel.getAllTasks()
 
-        setUpObservers()
+        setupObservers()
+        setupAdapters()
         setupOnClickListeners()
         setupOnRefreshListeners()
         setSwipeToDelete()
+    }
+
+    private fun setupAdapters() {
+        taskListAdapter =
+            TaskListAdapter(
+                taskList,
+                onClickTaskCompletedListener = { task ->
+                    onClickTaskCompletedListener(task)
+                },
+                onClickItemListener = { task ->
+                    onClickItemListener(task)
+                })
+
+        taskListBinding.rvTaskList.layoutManager = LinearLayoutManager(this)
+        taskListBinding.rvTaskList.adapter = taskListAdapter
     }
 
     private fun setSwipeToDelete() {
@@ -76,31 +92,32 @@ class TaskListActivity : AppCompatActivity() {
             }
 
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-                taskList?.let { notNullTaskList ->
-                    val position = viewHolder.adapterPosition
-                    val task = notNullTaskList[position]
+                taskListBinding.srlRefreshTaskList.isEnabled = false
 
-                    notNullTaskList.removeAt(position)
-                    taskListAdapter?.notifyItemRemoved(position)
+                val position = viewHolder.adapterPosition
+                val task = taskList[position]
+
+                taskList.removeAt(position)
+                taskListAdapter.notifyItemRemoved(position)
+                updateTaskListUI()
+
+                Snackbar.make(
+                    taskListBinding.rvTaskList,
+                    "Task ${task.title} was deleted",
+                    Snackbar.LENGTH_LONG
+                ).setAction("Undo") {
+                    taskList.add(position, task)
+                    taskListAdapter.notifyItemInserted(position)
                     updateTaskListUI()
-
-                    Snackbar.make(
-                        taskListBinding.rvTaskList,
-                        "Se ha eliminado la tarea ${task.title}",
-                        Snackbar.LENGTH_LONG
-                    ).setAction("Undo") {
-                        notNullTaskList.add(position, task)
-                        taskListAdapter?.notifyItemInserted(position)
-                        updateTaskListUI()
-                    }.addCallback(object : Snackbar.Callback() {
-                        override fun onDismissed(transientBottomBar: Snackbar?, event: Int) {
-                            if (event != DISMISS_EVENT_ACTION) {
-                                task.id?.let { taskViewModel.deleteTaskById(it) }
-                            }
+                    taskListBinding.srlRefreshTaskList.isEnabled = true
+                }.addCallback(object : Snackbar.Callback() {
+                    override fun onDismissed(transientBottomBar: Snackbar?, event: Int) {
+                        if (event != DISMISS_EVENT_ACTION) {
+                            task.id?.let { taskViewModel.deleteTaskById(it) }
+                            taskListBinding.srlRefreshTaskList.isEnabled = true
                         }
-                    }).show()
-
-                }
+                    }
+                }).show()
             }
 
         }).attachToRecyclerView(taskListBinding.rvTaskList)
@@ -118,31 +135,19 @@ class TaskListActivity : AppCompatActivity() {
         }
     }
 
-    private fun setUpObservers() {
+    private fun setupObservers() {
         taskViewModel.allTasks.observe(this) { allTasks ->
-            taskList = allTasks
+            taskList.clear()
+            taskList.addAll(allTasks)
             updateTaskListUI()
-            if (allTasks.isNotEmpty()) {
-                taskListAdapter =
-                    TaskListAdapter(allTasks,
-                        onClickTaskCompletedListener = { task ->
-                            onClickTaskCompletedListener(task)
-                        },
-                        onClickItemListener = { task ->
-                            onClickItemListener(task)
-                        })
-
-                taskListBinding.rvTaskList.layoutManager = LinearLayoutManager(this)
-                taskListBinding.rvTaskList.adapter = taskListAdapter
-            }
-
+            taskListAdapter.updateTasks(allTasks)
             taskListBinding.srlRefreshTaskList.isRefreshing = false
         }
     }
 
     private fun onClickItemListener(task: Task) {
         val intent = Intent(this, UpdateTaskActivity::class.java)
-        intent.putExtra("TASK_ID", task.id)
+        intent.putExtra(TaskKeys.TASK_ID, task.id)
         startActivity(intent)
     }
 
@@ -151,7 +156,7 @@ class TaskListActivity : AppCompatActivity() {
     }
 
     private fun updateTaskListUI() {
-        if (taskList.isNullOrEmpty()) {
+        if (taskList.isEmpty()) {
             taskListBinding.rvTaskList.visibility = View.GONE
             taskListBinding.tvCreateATask.visibility = View.VISIBLE
         } else {

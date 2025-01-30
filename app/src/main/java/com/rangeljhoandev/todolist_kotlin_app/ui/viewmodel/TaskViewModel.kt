@@ -8,21 +8,22 @@ import com.rangeljhoandev.todolist_kotlin_app.domain.DeleteTaskByIdUseCase
 import com.rangeljhoandev.todolist_kotlin_app.domain.GetAllTasksUseCase
 import com.rangeljhoandev.todolist_kotlin_app.domain.GetTaskByIdUseCase
 import com.rangeljhoandev.todolist_kotlin_app.domain.SaveTaskUseCase
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class TaskViewModel : ViewModel() {
+@HiltViewModel
+class TaskViewModel @Inject constructor(
+    private val getAllTasksUseCase: GetAllTasksUseCase,
+    private val savedTaskUseCase: SaveTaskUseCase,
+    private val taskByIdUseCase: GetTaskByIdUseCase,
+    private val deletedTaskById: DeleteTaskByIdUseCase
+) : ViewModel() {
 
     val allTasks = MutableLiveData<ArrayList<Task>>()
-    var getAllTasksUseCase = GetAllTasksUseCase()
-
     val savedTask = MutableLiveData<Task?>()
-    var savedTaskUseCase = SaveTaskUseCase()
-
     val taskById = MutableLiveData<Task?>()
-    var taskByIdUseCase = GetTaskByIdUseCase()
-
     val deletedTask = MutableLiveData<Task?>()
-    var deletedTaskById = DeleteTaskByIdUseCase()
 
     fun getAllTasks() {
         viewModelScope.launch {
