@@ -1,8 +1,7 @@
 package com.rangeljhoandev.todolist_kotlin_app.ui.view
 
-import android.content.Intent
+import android.app.Activity
 import android.content.res.ColorStateList
-import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
 import android.view.View
@@ -58,7 +57,6 @@ class UpdateTaskActivity : AppCompatActivity() {
 
         if (intent.hasExtra(TaskKeys.TASK_ID)) {
             task = Task(intent.getLongExtra(TaskKeys.TASK_ID, 0), "", "", Date(), Date(), -1)
-
             taskViewModel.getTaskById(task!!.id!!)
         }
 
@@ -86,7 +84,7 @@ class UpdateTaskActivity : AppCompatActivity() {
         taskViewModel.savedTask.observe(this) { savedTask ->
             if (savedTask != null) {
                 Toast.makeText(this, "Task was updated", Toast.LENGTH_SHORT).show()
-                startActivity(Intent(this, TaskListActivity::class.java))
+                setResult(Activity.RESULT_OK)
                 finish()
             } else {
                 Toast.makeText(this, "Error updating task", Toast.LENGTH_LONG).show()
@@ -174,10 +172,10 @@ class UpdateTaskActivity : AppCompatActivity() {
             task = Task(null, "", "", Date(), Date(), -1)
         }
 
-        task = task?.copy(dueDate = c.time).apply {
+        task = task?.copy(dueDate = c.time)?.apply {
             updateTaskBinding.etTaskDueDate.setText(
                 DateUtil.formatDate2String(
-                    task!!.dueDate,
+                    dueDate,
                     "dd-MM-yyyy 'at' HH:mm"
                 )
             )

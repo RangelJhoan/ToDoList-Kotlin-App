@@ -1,11 +1,13 @@
 package com.rangeljhoandev.todolist_kotlin_app.ui.view
 
+import android.app.Activity
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.view.View
 import android.view.WindowInsetsController
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
@@ -30,6 +32,13 @@ class TaskListActivity : AppCompatActivity() {
 
     private lateinit var taskListAdapter: TaskListAdapter
     private val taskList: ArrayList<Task> = arrayListOf()
+
+    private val updateTaskLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                taskViewModel.getAllTasks()
+            }
+        }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -131,24 +140,24 @@ class TaskListActivity : AppCompatActivity() {
 
     private fun setupOnClickListeners() {
         taskListBinding.btnAddTask.setOnClickListener {
-            startActivity(Intent(this, UpdateTaskActivity::class.java))
+            val intent = Intent(this, UpdateTaskActivity::class.java)
+            updateTaskLauncher.launch(intent)
         }
     }
 
     private fun setupObservers() {
         taskViewModel.allTasks.observe(this) { allTasks ->
-            taskList.clear()
-            taskList.addAll(allTasks)
-            updateTaskListUI()
             taskListAdapter.updateTasks(allTasks)
+            updateTaskListUI()
             taskListBinding.srlRefreshTaskList.isRefreshing = false
         }
     }
 
     private fun onClickItemListener(task: Task) {
-        val intent = Intent(this, UpdateTaskActivity::class.java)
-        intent.putExtra(TaskKeys.TASK_ID, task.id)
-        startActivity(intent)
+        val intent = Intent(this, UpdateTaskActivity::class.java).apply {
+            putExtra(TaskKeys.TASK_ID, task.id)
+        }
+        updateTaskLauncher.launch(intent)
     }
 
     private fun onClickTaskCompletedListener(task: Task) {
