@@ -8,24 +8,24 @@ class TaskRepository @Inject constructor(
     private val service: TaskService
 ) {
 
-    suspend fun getAllTasks(): ArrayList<Task> {
-        val response = service.getAllTasks()
-        return response
+    suspend fun getAllTasks(): Result<ArrayList<Task>> {
+        val result = service.getAllTasks()
+        return result
     }
 
-    suspend fun getTaskById(taskId: Long): Task? {
-        val response = service.getTaskById(taskId)
-        return response
+    suspend fun getTaskById(taskId: Long): Result<Task?> {
+        val result = service.getTaskById(taskId)
+        return result
     }
 
-    suspend fun saveTask(task: Task): Task? {
-        val response = service.saveTask(task)
-        return response
+    suspend fun saveTask(task: Task): Result<Task?> {
+        val result = service.saveTask(task)
+        return result
     }
 
-    suspend fun deleteTaskById(taskId: Long): Task? {
-        val response = service.deleteTaskById(taskId)
-        return response
+    suspend fun deleteTaskById(taskId: Long): Result<Task?> {
+        val result = service.deleteTaskById(taskId)
+        return result
     }
 
 }

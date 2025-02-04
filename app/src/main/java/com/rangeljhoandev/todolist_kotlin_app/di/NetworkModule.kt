@@ -19,11 +19,12 @@ object NetworkModule {
         .setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ")
         .create()
 
+    // SERVER BASE URL = "https://todolist-kotlin-ar-latest.onrender.com/"
+    // LOCALHOST BASE URL = "http://{LOCAL_IP}:8080/"
     @Singleton
     @Provides
     fun provideRetrofit(): Retrofit = Retrofit.Builder()
-        //.baseUrl("https://todolist-kotlin-ar-latest.onrender.com/") -> Para remoto
-        .baseUrl("http://192.168.2.10:8080/") // -> Para local
+        .baseUrl("https://todolist-kotlin-ar-latest.onrender.com/")
         .addConverterFactory(GsonConverterFactory.create(gson))
         .build()
 

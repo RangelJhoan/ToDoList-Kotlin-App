@@ -149,7 +149,12 @@ class TaskListActivity : AppCompatActivity() {
         taskViewModel.allTasks.observe(this) { allTasks ->
             taskListAdapter.updateTasks(allTasks)
             updateTaskListUI()
-            taskListBinding.srlRefreshTaskList.isRefreshing = false
+        }
+
+        taskViewModel.errorMessage.observe(this) { errorMessage ->
+            taskList.clear()
+            updateTaskListUI()
+            taskListBinding.tvTaskListMessage.text = errorMessage
         }
     }
 
@@ -167,11 +172,13 @@ class TaskListActivity : AppCompatActivity() {
     private fun updateTaskListUI() {
         if (taskList.isEmpty()) {
             taskListBinding.rvTaskList.visibility = View.GONE
-            taskListBinding.tvCreateATask.visibility = View.VISIBLE
+            taskListBinding.tvTaskListMessage.visibility = View.VISIBLE
+            taskListBinding.tvTaskListMessage.text = getString(R.string.no_tasks_created)
         } else {
             taskListBinding.rvTaskList.visibility = View.VISIBLE
-            taskListBinding.tvCreateATask.visibility = View.GONE
+            taskListBinding.tvTaskListMessage.visibility = View.GONE
         }
+        taskListBinding.srlRefreshTaskList.isRefreshing = false
     }
 
 }
