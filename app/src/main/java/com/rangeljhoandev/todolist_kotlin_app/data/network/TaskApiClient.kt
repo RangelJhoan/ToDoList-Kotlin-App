@@ -17,7 +17,7 @@ interface TaskApiClient {
     suspend fun getTaskById(@Path("id") taskId: Long): Response<Task?>
 
     @POST("task/save")
-    suspend fun saveTask(@Body task: Task): Response<Task>
+    suspend fun saveTask(@Body task: Task): Response<Task?>
 
     @DELETE("task/{id}")
     suspend fun deleteTaskById(@Path("id") taskId: Long): Response<Task?>

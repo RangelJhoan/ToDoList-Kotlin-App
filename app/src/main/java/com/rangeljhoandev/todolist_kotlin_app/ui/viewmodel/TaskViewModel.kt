@@ -1,14 +1,12 @@
 package com.rangeljhoandev.todolist_kotlin_app.ui.viewmodel
 
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.viewModelScope
 import com.rangeljhoandev.todolist_kotlin_app.data.model.Task
 import com.rangeljhoandev.todolist_kotlin_app.domain.DeleteTaskByIdUseCase
 import com.rangeljhoandev.todolist_kotlin_app.domain.GetAllTasksUseCase
 import com.rangeljhoandev.todolist_kotlin_app.domain.GetTaskByIdUseCase
 import com.rangeljhoandev.todolist_kotlin_app.domain.SaveTaskUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
@@ -29,8 +27,7 @@ class TaskViewModel @Inject constructor(
     }
 
     fun getTaskById(taskId: Long) {
-        val response = suspend { getTaskByIdUseCase(taskId) }
-        executeUseCase(response, taskById)
+        executeUseCase({ getTaskByIdUseCase(taskId) }, taskById)
     }
 
     fun saveTask(task: Task) {

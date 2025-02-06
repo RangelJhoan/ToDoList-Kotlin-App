@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.view.WindowInsetsController
 import androidx.activity.enableEdgeToEdge
@@ -112,7 +113,7 @@ class TaskListActivity : AppCompatActivity() {
 
                 Snackbar.make(
                     taskListBinding.rvTaskList,
-                    "Task ${task.title} was deleted",
+                    "Task \"${task.title}\" was deleted",
                     Snackbar.LENGTH_LONG
                 ).setAction("Undo") {
                     taskList.add(position, task)
@@ -155,6 +156,10 @@ class TaskListActivity : AppCompatActivity() {
             taskList.clear()
             updateTaskListUI()
             taskListBinding.tvTaskListMessage.text = errorMessage
+        }
+
+        taskViewModel.deletedTask.observe(this) { task ->
+            Log.i("TASK_LIST_DEL_TASK_OBS", "Task \"${task?.title}\" has been successfully removed")
         }
     }
 
