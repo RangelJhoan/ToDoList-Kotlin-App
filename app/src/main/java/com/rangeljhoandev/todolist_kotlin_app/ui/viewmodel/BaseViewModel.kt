@@ -15,9 +15,9 @@ abstract class BaseViewModel : ViewModel() {
         mutableLiveData: MutableLiveData<T>
     ) {
         viewModelScope.launch {
-            when (val resource = useCase()) {
-                is ResultWrapped.Success -> mutableLiveData.postValue(resource.data)
-                is ResultWrapped.Error -> errorMessage.postValue(resource.errorMessage)
+            when (val resultWrapped = useCase()) {
+                is ResultWrapped.Success -> mutableLiveData.postValue(resultWrapped.data)
+                is ResultWrapped.Error -> errorMessage.postValue(resultWrapped.errorMessage)
             }
         }
     }

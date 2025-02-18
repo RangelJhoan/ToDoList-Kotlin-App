@@ -110,7 +110,7 @@ class TaskViewModelTest {
             taskViewModel.getAllTasks()
 
             // Then
-            assert(taskViewModel.errorMessage.value.equals(resource.errorMessage))
+            assertEquals(taskViewModel.errorMessage.value, resource.errorMessage)
         }
 
     // GetTaskByIdUseCase Tests
